@@ -88,6 +88,16 @@ export const systemConfig = pgTable("system_config", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Department adjustments table for superadmin department-level point management
+export const departmentAdjustments = pgTable("department_adjustments", {
+  id: serial("id").primaryKey(),
+  department: varchar("department").notNull(),
+  adjustmentAmount: integer("adjustment_amount").notNull(), // Can be positive or negative
+  reason: text("reason"),
+  adjustedBy: varchar("adjusted_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   sentTransactions: many(transactions, { relationName: "sender" }),
@@ -158,5 +168,9 @@ export type InsertCoachAnalysis = z.infer<typeof insertCoachAnalysisSchema>;
 // System configuration types
 export type SystemConfig = typeof systemConfig.$inferSelect;
 export type InsertSystemConfig = typeof systemConfig.$inferInsert;
+
+// Department adjustment types
+export type DepartmentAdjustment = typeof departmentAdjustments.$inferSelect;
+export type InsertDepartmentAdjustment = typeof departmentAdjustments.$inferInsert;
 
 

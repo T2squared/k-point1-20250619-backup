@@ -5,6 +5,7 @@ import {
   dailyLimits,
   coachAnalysis,
   systemConfig,
+  departmentAdjustments,
   type User,
   type UpsertUser,
   type InsertTransaction,
@@ -16,6 +17,8 @@ import {
   type UserWithStats,
   type CoachAnalysis,
   type InsertCoachAnalysis,
+  type DepartmentAdjustment,
+  type InsertDepartmentAdjustment,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, ne, and, desc, sql, gte, lte, sum, count, isNotNull } from "drizzle-orm";
@@ -69,6 +72,10 @@ export interface IStorage {
   
   // Superadmin operations for user management
   updateUserName(userId: string, firstName: string, lastName: string, updatedBy: string): Promise<User>;
+  
+  // Department adjustment operations (superadmin only)
+  adjustDepartmentPoints(department: string, adjustmentAmount: number, reason: string, adjustedBy: string): Promise<void>;
+  getDepartmentAdjustments(department?: string): Promise<DepartmentAdjustment[]>;
   
   // Coach analysis operations
   saveCoachAnalysis(analysis: InsertCoachAnalysis): Promise<CoachAnalysis>;

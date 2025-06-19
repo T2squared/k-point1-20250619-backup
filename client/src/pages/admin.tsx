@@ -612,17 +612,27 @@ export default function Admin() {
                     </div>
                   </div>
                   {user?.role === 'superadmin' && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setCirculationAmount(stats?.totalCirculation || 0);
-                        setIsCirculationDialogOpen(true);
-                      }}
-                    >
-                      <Settings className="h-4 w-4 mr-1" />
-                      変更
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setCirculationAmount(stats?.totalCirculation || 0);
+                          setIsCirculationDialogOpen(true);
+                        }}
+                      >
+                        <Settings className="h-4 w-4 mr-1" />
+                        流通量設定
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setIsDepartmentAdjustDialogOpen(true)}
+                      >
+                        <Settings className="h-4 w-4 mr-1" />
+                        部門調整
+                      </Button>
+                    </div>
                   )}
                 </div>
               </CardContent>
@@ -1064,6 +1074,73 @@ export default function Admin() {
                         disabled={setCirculationMutation.isPending || circulationAmount <= 0}
                       >
                         {setCirculationMutation.isPending ? "設定中..." : "設定"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Department Point Adjustment Dialog */}
+                <Dialog open={isDepartmentAdjustDialogOpen} onOpenChange={setIsDepartmentAdjustDialogOpen}>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>部門別ポイント調整</DialogTitle>
+                      <DialogDescription>
+                        部門全体のポイントを調整し、該当部門のユーザーに自動で再分配します。
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="adjustDepartment" className="text-right">
+                          部門
+                        </Label>
+                        <Select value={adjustmentData.department} onValueChange={(value) => setAdjustmentData({...adjustmentData, department: value})}>
+                          <SelectTrigger className="col-span-3">
+                            <SelectValue placeholder="部門を選択" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="集積">集積</SelectItem>
+                            <SelectItem value="製造1">製造1</SelectItem>
+                            <SelectItem value="製造2">製造2</SelectItem>
+                            <SelectItem value="大臣">大臣</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="adjustmentAmount" className="text-right">
+                          調整量
+                        </Label>
+                        <Input
+                          id="adjustmentAmount"
+                          type="number"
+                          value={adjustmentData.adjustmentAmount}
+                          onChange={(e) => setAdjustmentData({...adjustmentData, adjustmentAmount: parseInt(e.target.value) || 0})}
+                          className="col-span-3"
+                          placeholder="正数で加算、負数で減算"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="adjustmentReason" className="text-right">
+                          理由
+                        </Label>
+                        <Input
+                          id="adjustmentReason"
+                          value={adjustmentData.reason}
+                          onChange={(e) => setAdjustmentData({...adjustmentData, reason: e.target.value})}
+                          className="col-span-3"
+                          placeholder="調整理由（任意）"
+                        />
+                      </div>
+                      <div className="text-sm text-gray-500 px-4">
+                        ※ポイントは該当部門の全ユーザーに均等分配されます
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button 
+                        type="submit" 
+                        onClick={() => adjustDepartmentMutation.mutate(adjustmentData)}
+                        disabled={adjustDepartmentMutation.isPending || !adjustmentData.department || adjustmentData.adjustmentAmount === 0}
+                      >
+                        {adjustDepartmentMutation.isPending ? "調整中..." : "調整実行"}
                       </Button>
                     </DialogFooter>
                   </DialogContent>

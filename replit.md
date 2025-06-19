@@ -113,6 +113,7 @@ K-point is an internal gratitude point system that allows employees to send and 
   - ユーザー部門割り振り完了：集積3名、製造1・製造2各3名、大臣4名
   - ユーザー名を部門名+数字形式に統一（例：集積1、製造1-1、大臣4）
   - SuperAdmin部門設定完了、グラフ・統計分析から除外設定
+  - SuperAdmin専用部門別ポイント調整機能実装（加算・減算・自動再分配）
 
 ## Technical Lessons Learned
 - systemConfigのインポートエラー根本原因：shared/schema.tsからの適切なインポートが不完全
