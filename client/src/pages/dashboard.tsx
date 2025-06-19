@@ -144,7 +144,7 @@ export default function Dashboard() {
           {/* Recent Activity Sidebar */}
           <div className="space-y-6">
             <RecentActivity />
-            <DepartmentRankings rankings={departmentRankings || []} />
+            <DepartmentRankings rankings={(departmentRankings || []).filter((dept: any) => dept.name !== 'SuperAdmin' && dept.name !== '')} />
           </div>
         </div>
 

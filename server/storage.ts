@@ -308,7 +308,13 @@ export class DatabaseStorage implements IStorage {
         memberCount: sql<number>`count(*)`,
       })
       .from(users)
-      .where(eq(users.isActive, true))
+      .where(and(
+        eq(users.isActive, true),
+        ne(users.role, 'superadmin'), // SuperAdminを除外
+        isNotNull(users.department),
+        ne(users.department, ''),
+        ne(users.department, 'SuperAdmin') // SuperAdmin部門を除外
+      ))
       .groupBy(users.department)
       .orderBy(desc(sum(users.pointBalance)));
     

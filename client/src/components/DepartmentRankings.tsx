@@ -32,7 +32,10 @@ export default function DepartmentRankings({ rankings }: DepartmentRankingsProps
       <CardContent>
         <div className="space-y-3">
           {rankings && rankings.length > 0 ? (
-            rankings.slice(0, 5).map((dept, index) => (
+            rankings
+              .filter((dept) => dept.name !== 'SuperAdmin' && dept.name !== '')
+              .slice(0, 5)
+              .map((dept, index) => (
               <div key={dept.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
                 <div className="flex items-center space-x-3">
                   <div className="flex-shrink-0">

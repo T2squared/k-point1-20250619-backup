@@ -223,20 +223,26 @@ export default function Admin() {
     retry: false,
   });
 
-  // Process data for charts
-  const departmentChartData = departmentRankings ? departmentRankings.map((dept: any) => ({
-    name: dept.name,
-    totalPoints: dept.totalPoints,
-    memberCount: dept.memberCount,
-    averagePoints: Math.round(dept.totalPoints / dept.memberCount)
-  })) : [];
+  // Process data for charts (exclude SuperAdmin)
+  const departmentChartData = departmentRankings ? 
+    departmentRankings
+      .filter((dept: any) => dept.name !== 'SuperAdmin' && dept.name !== '')
+      .map((dept: any) => ({
+        name: dept.name,
+        totalPoints: dept.totalPoints,
+        memberCount: dept.memberCount,
+        averagePoints: Math.round(dept.totalPoints / dept.memberCount)
+      })) : [];
 
-  const userScatterData = allUsers ? allUsers.map((user: any) => ({
-    name: `${user.lastName} ${user.firstName}`,
-    sent: user.pointBalance, // Points they currently have (reverse of sent)
-    received: user.monthlyReceived || 0,
-    department: user.department
-  })) : [];
+  const userScatterData = allUsers ? 
+    allUsers
+      .filter((user: any) => user.role !== 'superadmin' && user.department !== 'SuperAdmin')
+      .map((user: any) => ({
+        name: `${user.lastName} ${user.firstName}`,
+        sent: user.pointBalance, // Points they currently have (reverse of sent)
+        received: user.monthlyReceived || 0,
+        department: user.department
+      })) : [];
 
   const departmentColors = [
     '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'
