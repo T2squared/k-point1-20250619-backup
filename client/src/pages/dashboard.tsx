@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   const { data: systemStats } = useQuery({
     queryKey: ["/api/admin/stats"],
-    enabled: !!user && user.role === 'admin',
+    enabled: !!user,
     retry: false,
   });
 
@@ -127,7 +127,7 @@ export default function Dashboard() {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">システム総流通量</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {systemStats?.totalCirculation || 1000}
+                    {systemStats?.totalCirculation || 0}
                   </p>
                 </div>
               </div>
