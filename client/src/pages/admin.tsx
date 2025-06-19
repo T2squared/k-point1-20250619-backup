@@ -114,6 +114,40 @@ export default function Admin() {
       });
     },
   });
+  
+  // System circulation mutation (superadmin only)
+  const setCirculationMutation = useMutation({
+    mutationFn: async (amount: number) => {
+      const res = await apiRequest('POST', '/api/admin/set-circulation', { amount });
+      return await res.json();
+    },
+    onSuccess: () => {
+      setIsCirculationDialogOpen(false);
+      toast({
+        title: "システム流通量更新完了",
+        description: `システム総流通量が${circulationAmount}ポイントに設定されました。`,
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "認証エラー",
+          description: "再ログインしています...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "設定エラー",
+        description: "システム流通量の設定に失敗しました。",
+        variant: "destructive",
+      });
+    },
+  });
+  
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     id: '',
@@ -125,6 +159,10 @@ export default function Admin() {
     pointBalance: 20,
     isActive: true
   });
+  
+  // System circulation management state
+  const [isCirculationDialogOpen, setIsCirculationDialogOpen] = useState(false);
+  const [circulationAmount, setCirculationAmount] = useState(1000);
 
   // Redirect to home if not authenticated or not admin
   useEffect(() => {
@@ -951,6 +989,46 @@ export default function Admin() {
                         disabled={createUserMutation.isPending || !newUser.id || !newUser.firstName || !newUser.lastName}
                       >
                         {createUserMutation.isPending ? "作成中..." : "作成"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                {/* System Circulation Setting Dialog */}
+                <Dialog open={isCirculationDialogOpen} onOpenChange={setIsCirculationDialogOpen}>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>システム総流通量設定</DialogTitle>
+                      <DialogDescription>
+                        システム全体のポイント流通量を設定します。この設定はスーパーユーザーのみが変更可能です。
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="circulation" className="text-right">
+                          流通量
+                        </Label>
+                        <Input
+                          id="circulation"
+                          type="number"
+                          value={circulationAmount}
+                          onChange={(e) => setCirculationAmount(parseInt(e.target.value) || 0)}
+                          className="col-span-3"
+                          min="0"
+                          placeholder="1000"
+                        />
+                      </div>
+                      <div className="text-sm text-gray-500 px-4">
+                        現在の総流通量: {stats?.totalCirculation || 0} ポイント
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button 
+                        type="submit" 
+                        onClick={() => setCirculationMutation.mutate(circulationAmount)}
+                        disabled={setCirculationMutation.isPending || circulationAmount <= 0}
+                      >
+                        {setCirculationMutation.isPending ? "設定中..." : "設定"}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
