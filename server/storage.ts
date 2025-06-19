@@ -18,7 +18,7 @@ import {
   type InsertCoachAnalysis,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, gte, lte, sum } from "drizzle-orm";
+import { eq, ne, and, desc, sql, gte, lte, sum, count, isNotNull } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (mandatory for Replit Auth)
