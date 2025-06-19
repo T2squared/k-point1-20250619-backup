@@ -541,7 +541,7 @@ export default function Admin() {
         </div>
 
         {/* System Stats */}
-        {systemStats && (
+        {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card>
               <CardContent className="p-6">
@@ -551,7 +551,7 @@ export default function Admin() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">総ユーザー数</p>
-                    <p className="text-2xl font-bold text-gray-900">{systemStats.totalUsers}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.totalUsers}</p>
                   </div>
                 </div>
               </CardContent>
@@ -565,7 +565,7 @@ export default function Admin() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">今日の送付数</p>
-                    <p className="text-2xl font-bold text-gray-900">{systemStats.todayTransactions}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.todayTransactions}</p>
                   </div>
                 </div>
               </CardContent>
@@ -579,7 +579,7 @@ export default function Admin() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">アクティブ部署</p>
-                    <p className="text-2xl font-bold text-gray-900">{systemStats.activeDepartments}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.activeDepartments}</p>
                   </div>
                 </div>
               </CardContent>
@@ -587,14 +587,29 @@ export default function Admin() {
             
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-full bg-warning/10">
-                    <TrendingUp className="h-6 w-6 text-warning" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="p-3 rounded-full bg-warning/10">
+                      <TrendingUp className="h-6 w-6 text-warning" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">総流通量</p>
+                      <p className="text-2xl font-bold text-gray-900">{stats?.totalCirculation || 0}</p>
+                    </div>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">総流通量</p>
-                    <p className="text-2xl font-bold text-gray-900">{systemStats.totalCirculation}</p>
-                  </div>
+                  {user?.role === 'superadmin' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setCirculationAmount(stats?.totalCirculation || 1000);
+                        setIsCirculationDialogOpen(true);
+                      }}
+                    >
+                      <Settings className="h-4 w-4 mr-1" />
+                      変更
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
