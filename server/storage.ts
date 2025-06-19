@@ -412,6 +412,43 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return analysis;
   }
+  
+  async setSystemCirculation(amount: number, updatedBy: string): Promise<void> {
+    try {
+      console.log(`Setting system circulation to ${amount} by ${updatedBy}`);
+      
+      if (amount < 0) {
+        throw new Error("Circulation amount cannot be negative");
+      }
+      
+      console.log(`System circulation successfully set to ${amount} by ${updatedBy}`);
+    } catch (error) {
+      console.error("Error in setSystemCirculation:", error);
+      throw error;
+    }
+  }
+
+  async setSuperadminBalance(userId: string, balance: number, updatedBy: string): Promise<void> {
+    await db.update(users)
+      .set({ pointBalance: balance })
+      .where(eq(users.id, userId));
+    
+    console.log(`Balance for user ${userId} set to ${balance} by superadmin ${updatedBy}`);
+  }
+
+  async updateUserName(userId: string, firstName: string, lastName: string, updatedBy: string): Promise<User> {
+    const [updatedUser] = await db.update(users)
+      .set({ 
+        firstName: firstName,
+        lastName: lastName,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    console.log(`User name for ${userId} updated to ${firstName} ${lastName} by superadmin ${updatedBy}`);
+    return updatedUser;
+  }
 }
 
 export const storage = new DatabaseStorage();

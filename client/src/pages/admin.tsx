@@ -118,17 +118,25 @@ export default function Admin() {
   // System circulation mutation (superadmin only)
   const setCirculationMutation = useMutation({
     mutationFn: async (amount: number) => {
+      console.log("Setting circulation to:", amount);
       const res = await apiRequest('POST', '/api/admin/set-circulation', { amount });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `HTTP ${res.status}`);
+      }
       return await res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Circulation set successfully:", data);
       setIsCirculationDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
         title: "システム流通量更新完了",
         description: `システム総流通量が${circulationAmount}ポイントに設定されました。`,
       });
     },
     onError: (error) => {
+      console.error("Circulation setting error:", error);
       if (isUnauthorizedError(error)) {
         toast({
           title: "認証エラー",
@@ -142,7 +150,7 @@ export default function Admin() {
       }
       toast({
         title: "設定エラー",
-        description: "システム流通量の設定に失敗しました。",
+        description: `システム流通量の設定に失敗しました: ${error.message}`,
         variant: "destructive",
       });
     },
