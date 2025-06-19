@@ -320,28 +320,39 @@ export class DatabaseStorage implements IStorage {
 
   // Admin operations
   async getTotalCirculation(): Promise<number> {
-    // システム設定から目標流通量を取得
-    const [targetConfig] = await db
-      .select()
-      .from(systemConfig)
-      .where(eq(systemConfig.key, 'total_circulation_target'))
-      .limit(1);
-    
-    if (targetConfig) {
-      const targetCirculation = Number(targetConfig.value) || 0;
-      console.log("Target circulation from config:", targetCirculation);
-      return targetCirculation;
+    try {
+      // システム設定から目標流通量を取得
+      const [targetConfig] = await db
+        .select()
+        .from(systemConfig)
+        .where(eq(systemConfig.key, 'total_circulation_target'))
+        .limit(1);
+      
+      if (targetConfig) {
+        const targetCirculation = Number(targetConfig.value) || 0;
+        console.log("Target circulation from config:", targetCirculation);
+        return targetCirculation;
+      }
+      
+      // 設定がない場合は実際の残高の合計を返す
+      const [result] = await db
+        .select({ total: sum(users.pointBalance) })
+        .from(users)
+        .where(eq(users.isActive, true));
+      
+      const actualCirculation = Number(result?.total) || 0;
+      console.log("Actual circulation from balances:", actualCirculation);
+      return actualCirculation;
+    } catch (error) {
+      console.error("Error in getTotalCirculation:", error);
+      // エラーの場合は実際の残高の合計を返す
+      const [result] = await db
+        .select({ total: sum(users.pointBalance) })
+        .from(users)
+        .where(eq(users.isActive, true));
+      
+      return Number(result?.total) || 0;
     }
-    
-    // 設定がない場合は実際の残高の合計を返す
-    const [result] = await db
-      .select({ total: sum(users.pointBalance) })
-      .from(users)
-      .where(eq(users.isActive, true));
-    
-    const actualCirculation = Number(result?.total) || 0;
-    console.log("Actual circulation from balances:", actualCirculation);
-    return actualCirculation;
   }
 
   async getSystemStats(): Promise<{
@@ -452,7 +463,7 @@ export class DatabaseStorage implements IStorage {
         }
       });
       
-      console.log(`System circulation successfully set to ${amount} by ${updatedBy}`);
+      console.log(`System circulation successfully set to ${amount} by ${updatedBy} - saved to database`);
     } catch (error) {
       console.error("Error in setSystemCirculation:", error);
       throw error;
