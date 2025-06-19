@@ -110,6 +110,8 @@ K-point is an internal gratitude point system that allows employees to send and 
   - システム流通量制御機能完全実装
   - systemConfigテーブルのインポート問題を修正
   - 既存機能維持：認証システム、ポイント送付、AI分析、CSV/Sheets出力
+  - ユーザー部門割り振り完了：集積3名、製造1・製造2各3名、大臣4名
+  - ユーザー名を部門名+数字形式に統一（例：集積1、製造1-1、大臣4）
 
 ## Technical Lessons Learned
 - systemConfigのインポートエラー根本原因：shared/schema.tsからの適切なインポートが不完全
