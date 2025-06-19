@@ -335,11 +335,14 @@ export class DatabaseStorage implements IStorage {
         return targetCirculation;
       }
       
-      // 設定がない場合は実際の残高の合計を返す
+      // 設定がない場合は実際の残高の合計を返す（SuperAdminを除外）
       const [result] = await db
         .select({ total: sum(users.pointBalance) })
         .from(users)
-        .where(eq(users.isActive, true));
+        .where(and(
+          eq(users.isActive, true),
+          ne(users.role, 'superadmin') // SuperAdminを流通量から除外
+        ));
       
       const actualCirculation = Number(result?.total) || 0;
       console.log("Actual circulation from balances:", actualCirculation);
