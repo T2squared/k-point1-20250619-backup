@@ -610,7 +610,7 @@ export default function Admin() {
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        setCirculationAmount(stats?.totalCirculation || 1000);
+                        setCirculationAmount(stats?.totalCirculation || 0);
                         setIsCirculationDialogOpen(true);
                       }}
                     >
