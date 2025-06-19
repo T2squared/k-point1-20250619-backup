@@ -648,7 +648,7 @@ export default function Admin() {
             
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center">
                     <div className="p-3 rounded-full bg-warning/10">
                       <TrendingUp className="h-6 w-6 text-warning" />
@@ -659,7 +659,7 @@ export default function Admin() {
                     </div>
                   </div>
                   {user?.role === 'superadmin' && (
-                    <div className="flex space-x-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         size="sm"
                         variant="outline"
@@ -667,16 +667,18 @@ export default function Admin() {
                           setCirculationAmount(stats?.totalCirculation || 0);
                           setIsCirculationDialogOpen(true);
                         }}
+                        className="text-xs px-2 py-1"
                       >
-                        <Settings className="h-4 w-4 mr-1" />
+                        <Settings className="h-3 w-3 mr-1" />
                         流通量設定
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => setIsDepartmentAdjustDialogOpen(true)}
+                        className="text-xs px-2 py-1"
                       >
-                        <Settings className="h-4 w-4 mr-1" />
+                        <Settings className="h-3 w-3 mr-1" />
                         部門調整
                       </Button>
                     </div>
