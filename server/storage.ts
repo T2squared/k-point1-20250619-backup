@@ -51,6 +51,7 @@ export interface IStorage {
   
   // Admin operations
   getTotalCirculation(): Promise<number>;
+  setSystemCirculation(amount: number, updatedBy: string): Promise<void>;
   getSystemStats(): Promise<{
     totalUsers: number;
     todayTransactions: number;
@@ -61,6 +62,9 @@ export interface IStorage {
   // Bulk operations
   bulkUpsertUsers(users: UpsertUser[]): Promise<void>;
   resetQuarterlyPoints(): Promise<void>;
+  
+  // Superadmin operations for negative points
+  setSuperadminBalance(userId: string, balance: number, updatedBy: string): Promise<void>;
   
   // Coach analysis operations
   saveCoachAnalysis(analysis: InsertCoachAnalysis): Promise<CoachAnalysis>;

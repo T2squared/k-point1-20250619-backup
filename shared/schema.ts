@@ -88,15 +88,6 @@ export const systemConfig = pgTable("system_config", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// System configuration table for superadmin settings
-export const systemConfig = pgTable("system_config", {
-  id: serial("id").primaryKey(),
-  key: varchar("key").notNull().unique(),
-  value: text("value").notNull(),
-  updatedBy: varchar("updated_by").notNull().references(() => users.id),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   sentTransactions: many(transactions, { relationName: "sender" }),
@@ -132,19 +123,14 @@ export const coachAnalysisRelations = relations(coachAnalysis, ({ one }) => ({
   }),
 }));
 
-export const systemConfigRelations = relations(systemConfig, ({ one }) => ({
-  updater: one(users, {
-    fields: [systemConfig.updatedBy],
-    references: [users.id],
-  }),
-}));
+
 
 // Zod schemas
 export const insertUserSchema = createInsertSchema(users);
 export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true, createdAt: true });
 export const insertDepartmentSchema = createInsertSchema(departments).omit({ id: true, createdAt: true });
 export const insertCoachAnalysisSchema = createInsertSchema(coachAnalysis).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertSystemConfigSchema = createInsertSchema(systemConfig).omit({ id: true, updatedAt: true });
+
 
 // Types
 export type UpsertUser = typeof users.$inferInsert;
@@ -169,5 +155,4 @@ export type UserWithStats = User & {
 export type CoachAnalysis = typeof coachAnalysis.$inferSelect;
 export type InsertCoachAnalysis = z.infer<typeof insertCoachAnalysisSchema>;
 
-export type SystemConfig = typeof systemConfig.$inferSelect;
-export type InsertSystemConfig = z.infer<typeof insertSystemConfigSchema>;
+
