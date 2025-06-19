@@ -79,6 +79,41 @@ export default function Admin() {
   
   // User management state
   const [editingUser, setEditingUser] = useState<any>(null);
+  
+  // Name update mutation (superadmin only)
+  const updateUserNameMutation = useMutation({
+    mutationFn: async ({ userId, firstName, lastName }: { userId: string; firstName: string; lastName: string }) => {
+      const res = await apiRequest('PUT', `/api/admin/users/${userId}/name`, { firstName, lastName });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users/with-stats'] });
+      setEditingUser(null);
+      toast({
+        title: "ユーザー名更新完了",
+        description: "ユーザー名が正常に更新されました。",
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "認証エラー",
+          description: "再ログインしています...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "更新エラー",
+        description: "ユーザー名の更新に失敗しました。",
+        variant: "destructive",
+      });
+    },
+  });
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     id: '',
@@ -945,8 +980,29 @@ export default function Admin() {
                             alt={`${rowUser.firstName} ${rowUser.lastName}`}
                           />
                           <div>
-                            <p className="font-medium">{rowUser.lastName} {rowUser.firstName}</p>
-                            <p className="text-sm text-gray-500">{rowUser.email}</p>
+                            {editingUser?.id === rowUser.id && user?.role === 'superadmin' ? (
+                              <div className="flex flex-col space-y-1">
+                                <input
+                                  type="text"
+                                  value={editingUser.firstName}
+                                  onChange={(e) => setEditingUser({ ...editingUser, firstName: e.target.value })}
+                                  className="text-sm border rounded px-1 py-0.5 w-20"
+                                  placeholder="名"
+                                />
+                                <input
+                                  type="text"
+                                  value={editingUser.lastName}
+                                  onChange={(e) => setEditingUser({ ...editingUser, lastName: e.target.value })}
+                                  className="text-sm border rounded px-1 py-0.5 w-20"
+                                  placeholder="姓"
+                                />
+                              </div>
+                            ) : (
+                              <div>
+                                <p className="font-medium">{rowUser.lastName} {rowUser.firstName}</p>
+                                <p className="text-sm text-gray-500">{rowUser.email}</p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </TableCell>
@@ -960,12 +1016,11 @@ export default function Admin() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="営業部">営業部</SelectItem>
-                              <SelectItem value="マーケティング部">マーケティング部</SelectItem>
-                              <SelectItem value="開発部">開発部</SelectItem>
-                              <SelectItem value="人事部">人事部</SelectItem>
-                              <SelectItem value="総務部">総務部</SelectItem>
-                              <SelectItem value="経理部">経理部</SelectItem>
+                              <SelectItem value="">未設定</SelectItem>
+                              <SelectItem value="集積">集積</SelectItem>
+                              <SelectItem value="製造1">製造1</SelectItem>
+                              <SelectItem value="製造2">製造2</SelectItem>
+                              <SelectItem value="大臣">大臣</SelectItem>
                             </SelectContent>
                           </Select>
                         ) : (
@@ -1001,6 +1056,20 @@ export default function Admin() {
                       <TableCell>
                         {editingUser?.id === rowUser.id ? (
                           <div className="flex space-x-2">
+                            {user?.role === 'superadmin' && (editingUser.firstName !== rowUser.firstName || editingUser.lastName !== rowUser.lastName) && (
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() => updateUserNameMutation.mutate({ 
+                                  userId: rowUser.id,
+                                  firstName: editingUser.firstName,
+                                  lastName: editingUser.lastName
+                                })}
+                                disabled={updateUserNameMutation.isPending}
+                              >
+                                名前保存
+                              </Button>
+                            )}
                             <Button
                               size="sm"
                               onClick={() => updateUserMutation.mutate({ 
@@ -1028,6 +1097,8 @@ export default function Admin() {
                             variant="outline"
                             onClick={() => setEditingUser({
                               id: rowUser.id,
+                              firstName: rowUser.firstName,
+                              lastName: rowUser.lastName,
                               department: rowUser.department,
                               role: rowUser.role
                             })}
