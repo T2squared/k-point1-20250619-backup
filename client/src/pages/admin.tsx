@@ -908,7 +908,7 @@ export default function Admin() {
                             <SelectValue placeholder="部署を選択" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">未設定</SelectItem>
+                            <SelectItem value="未設定">未設定</SelectItem>
                             <SelectItem value="集積">集積</SelectItem>
                             <SelectItem value="製造1">製造1</SelectItem>
                             <SelectItem value="製造2">製造2</SelectItem>
