@@ -320,12 +320,28 @@ export class DatabaseStorage implements IStorage {
 
   // Admin operations
   async getTotalCirculation(): Promise<number> {
+    // システム設定から目標流通量を取得
+    const [targetConfig] = await db
+      .select()
+      .from(systemConfig)
+      .where(eq(systemConfig.key, 'total_circulation_target'))
+      .limit(1);
+    
+    if (targetConfig) {
+      const targetCirculation = Number(targetConfig.value) || 0;
+      console.log("Target circulation from config:", targetCirculation);
+      return targetCirculation;
+    }
+    
+    // 設定がない場合は実際の残高の合計を返す
     const [result] = await db
       .select({ total: sum(users.pointBalance) })
       .from(users)
       .where(eq(users.isActive, true));
     
-    return Number(result?.total) || 0;
+    const actualCirculation = Number(result?.total) || 0;
+    console.log("Actual circulation from balances:", actualCirculation);
+    return actualCirculation;
   }
 
   async getSystemStats(): Promise<{
@@ -420,6 +436,21 @@ export class DatabaseStorage implements IStorage {
       if (amount < 0) {
         throw new Error("Circulation amount cannot be negative");
       }
+      
+      // システム設定をデータベースに保存
+      await db.insert(systemConfig).values({
+        key: 'total_circulation_target',
+        value: amount.toString(),
+        updatedBy: updatedBy,
+        updatedAt: new Date()
+      }).onConflictDoUpdate({
+        target: systemConfig.key,
+        set: { 
+          value: amount.toString(), 
+          updatedBy: updatedBy, 
+          updatedAt: new Date() 
+        }
+      });
       
       console.log(`System circulation successfully set to ${amount} by ${updatedBy}`);
     } catch (error) {
