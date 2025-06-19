@@ -659,7 +659,7 @@ export default function Admin() {
                     </div>
                   </div>
                   {user?.role === 'superadmin' && (
-                    <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex flex-col gap-1">
                       <Button
                         size="sm"
                         variant="outline"
@@ -667,7 +667,7 @@ export default function Admin() {
                           setCirculationAmount(stats?.totalCirculation || 0);
                           setIsCirculationDialogOpen(true);
                         }}
-                        className="text-xs px-2 py-1"
+                        className="text-xs px-3 py-1 h-7"
                       >
                         <Settings className="h-3 w-3 mr-1" />
                         流通量設定
@@ -676,7 +676,7 @@ export default function Admin() {
                         size="sm"
                         variant="outline"
                         onClick={() => setIsDepartmentAdjustDialogOpen(true)}
-                        className="text-xs px-2 py-1"
+                        className="text-xs px-3 py-1 h-7"
                       >
                         <Settings className="h-3 w-3 mr-1" />
                         部門調整
