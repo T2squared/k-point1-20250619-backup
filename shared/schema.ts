@@ -155,4 +155,8 @@ export type UserWithStats = User & {
 export type CoachAnalysis = typeof coachAnalysis.$inferSelect;
 export type InsertCoachAnalysis = z.infer<typeof insertCoachAnalysisSchema>;
 
+// System configuration types
+export type SystemConfig = typeof systemConfig.$inferSelect;
+export type InsertSystemConfig = typeof systemConfig.$inferInsert;
+
 

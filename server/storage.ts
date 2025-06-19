@@ -4,6 +4,7 @@ import {
   departments,
   dailyLimits,
   coachAnalysis,
+  systemConfig,
   type User,
   type UpsertUser,
   type InsertTransaction,
@@ -449,19 +450,25 @@ export class DatabaseStorage implements IStorage {
       }
       
       // システム設定をデータベースに保存
-      await db.insert(systemConfig).values({
-        key: 'total_circulation_target',
-        value: amount.toString(),
-        updatedBy: updatedBy,
-        updatedAt: new Date()
-      }).onConflictDoUpdate({
-        target: systemConfig.key,
-        set: { 
-          value: amount.toString(), 
-          updatedBy: updatedBy, 
-          updatedAt: new Date() 
-        }
-      });
+      try {
+        await db.insert(systemConfig).values({
+          key: 'total_circulation_target',
+          value: amount.toString(),
+          updatedBy: updatedBy,
+          updatedAt: new Date()
+        }).onConflictDoUpdate({
+          target: systemConfig.key,
+          set: { 
+            value: amount.toString(), 
+            updatedBy: updatedBy, 
+            updatedAt: new Date() 
+          }
+        });
+        console.log("Database insert/update successful");
+      } catch (dbError) {
+        console.error("Database operation failed:", dbError);
+        throw new Error(`Failed to save circulation setting: ${dbError instanceof Error ? dbError.message : 'Unknown database error'}`);
+      }
       
       console.log(`System circulation successfully set to ${amount} by ${updatedBy} - saved to database`);
     } catch (error) {

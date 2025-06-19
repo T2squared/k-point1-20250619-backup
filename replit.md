@@ -107,8 +107,14 @@ K-point is an internal gratitude point system that allows employees to send and 
   - ユーザー1-13作成（部門未設定、後で編集可能）
   - スーパーユーザーのみ残してデータリセット完了
   - マイナスポイント設定機能（スーパーユーザー限定）
-  - システム流通量制御機能準備完了
+  - システム流通量制御機能完全実装
+  - systemConfigテーブルのインポート問題を修正
   - 既存機能維持：認証システム、ポイント送付、AI分析、CSV/Sheets出力
+
+## Technical Lessons Learned
+- systemConfigのインポートエラー根本原因：shared/schema.tsからの適切なインポートが不完全
+- 再発防止策：すべてのテーブル定義は明示的にインポートし、TypeScript型チェックを活用
+- データベース操作のエラーハンドリング強化：詳細なログ出力と適切な例外処理
 
 ## User Preferences
 
