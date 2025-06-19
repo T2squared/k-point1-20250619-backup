@@ -872,6 +872,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Set system circulation (superadmin only)
+  app.post("/api/admin/set-circulation", isAuthenticated, async (req: any, res) => {
+    console.log("Set circulation request received:", req.body);
+    console.log("User:", req.user?.id, req.user?.role);
+    
+    if (req.user.role !== "superadmin") {
+      return res.status(403).json({ message: "Superadmin access required" });
+    }
+
+    try {
+      const { amount } = req.body;
+      
+      console.log("Circulation amount:", amount);
+      
+      if (amount === undefined || amount < 0) {
+        return res.status(400).json({ message: "Valid circulation amount is required" });
+      }
+
+      await storage.setSystemCirculation(amount, req.user.id);
+      
+      console.log(`System circulation updated to ${amount} by ${req.user.id}`);
+      
+      res.json({ 
+        message: "System circulation updated successfully",
+        amount: amount,
+        updatedBy: req.user.id
+      });
+    } catch (error) {
+      console.error("Error setting circulation:", error);
+      res.status(500).json({ 
+        message: "Failed to set circulation",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Set user balance including negative values (superadmin only)
+  app.post("/api/admin/set-balance", isAuthenticated, async (req: any, res) => {
+    if (req.user.role !== "superadmin") {
+      return res.status(403).json({ message: "Superadmin access required" });
+    }
+
+    try {
+      const { userId, balance } = req.body;
+      
+      if (!userId || balance === undefined) {
+        return res.status(400).json({ message: "User ID and balance are required" });
+      }
+
+      await storage.setSuperadminBalance(userId, balance, req.user.id);
+      res.json({ message: "Balance updated successfully" });
+    } catch (error) {
+      console.error("Error setting balance:", error);
+      res.status(500).json({ message: "Failed to set balance" });
+    }
+  });
+
+  // Update user name (superadmin only)
+  app.put("/api/admin/users/:userId/name", isAuthenticated, async (req: any, res) => {
+    if (req.user.role !== "superadmin") {
+      return res.status(403).json({ message: "Superadmin access required" });
+    }
+
+    try {
+      const { userId } = req.params;
+      const { firstName, lastName } = req.body;
+      
+      if (!firstName || !lastName) {
+        return res.status(400).json({ message: "First name and last name are required" });
+      }
+
+      const updatedUser = await storage.updateUserName(userId, firstName, lastName, req.user.id);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user name:", error);
+      res.status(500).json({ message: "Failed to update user name" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
