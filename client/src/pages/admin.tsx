@@ -873,12 +873,11 @@ export default function Admin() {
                             <SelectValue placeholder="部署を選択" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="営業部">営業部</SelectItem>
-                            <SelectItem value="マーケティング部">マーケティング部</SelectItem>
-                            <SelectItem value="開発部">開発部</SelectItem>
-                            <SelectItem value="人事部">人事部</SelectItem>
-                            <SelectItem value="総務部">総務部</SelectItem>
-                            <SelectItem value="経理部">経理部</SelectItem>
+                            <SelectItem value="">未設定</SelectItem>
+                            <SelectItem value="集積">集積</SelectItem>
+                            <SelectItem value="製造1">製造1</SelectItem>
+                            <SelectItem value="製造2">製造2</SelectItem>
+                            <SelectItem value="大臣">大臣</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

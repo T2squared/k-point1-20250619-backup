@@ -66,6 +66,9 @@ export interface IStorage {
   // Superadmin operations for negative points
   setSuperadminBalance(userId: string, balance: number, updatedBy: string): Promise<void>;
   
+  // Superadmin operations for user management
+  updateUserName(userId: string, firstName: string, lastName: string, updatedBy: string): Promise<User>;
+  
   // Coach analysis operations
   saveCoachAnalysis(analysis: InsertCoachAnalysis): Promise<CoachAnalysis>;
   getCoachAnalysis(date: string, analysisType: string): Promise<CoachAnalysis | undefined>;
