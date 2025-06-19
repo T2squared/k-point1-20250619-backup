@@ -951,6 +951,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Department point adjustment (superadmin only)
+  app.post('/api/admin/departments/:department/adjust', isAuthenticated, async (req: any, res) => {
+    try {
+      if (req.user?.role !== 'superadmin') {
+        return res.status(403).json({ message: 'Access denied. Superadmin role required.' });
+      }
+
+      const { department } = req.params;
+      const { adjustmentAmount, reason } = req.body;
+
+      if (typeof adjustmentAmount !== 'number') {
+        return res.status(400).json({ message: 'Adjustment amount must be a number' });
+      }
+
+      if (!department || department === 'SuperAdmin') {
+        return res.status(400).json({ message: 'Invalid department' });
+      }
+
+      await storage.adjustDepartmentPoints(department, adjustmentAmount, reason || '', req.user.id);
+      
+      res.json({ 
+        message: 'Department points adjusted successfully',
+        department,
+        adjustmentAmount,
+        reason
+      });
+    } catch (error) {
+      console.error('Error adjusting department points:', error);
+      res.status(500).json({ message: error instanceof Error ? error.message : 'Failed to adjust department points' });
+    }
+  });
+
+  // Get department adjustments history
+  app.get('/api/admin/departments/adjustments', isAuthenticated, async (req: any, res) => {
+    try {
+      if (req.user?.role !== 'superadmin') {
+        return res.status(403).json({ message: 'Access denied. Superadmin role required.' });
+      }
+
+      const { department } = req.query;
+      const adjustments = await storage.getDepartmentAdjustments(department as string);
+      res.json(adjustments);
+    } catch (error) {
+      console.error('Error fetching department adjustments:', error);
+      res.status(500).json({ message: 'Failed to fetch department adjustments' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

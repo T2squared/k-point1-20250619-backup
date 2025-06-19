@@ -79,6 +79,14 @@ export default function Admin() {
   
   // User management state
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [isCirculationDialogOpen, setIsCirculationDialogOpen] = useState(false);
+  const [circulationAmount, setCirculationAmount] = useState(0);
+  const [isDepartmentAdjustDialogOpen, setIsDepartmentAdjustDialogOpen] = useState(false);
+  const [adjustmentData, setAdjustmentData] = useState({
+    department: '',
+    adjustmentAmount: 0,
+    reason: ''
+  });
   
   // Name update mutation (superadmin only)
   const updateUserNameMutation = useMutation({
@@ -118,7 +126,6 @@ export default function Admin() {
   // System circulation mutation (superadmin only)
   const setCirculationMutation = useMutation({
     mutationFn: async (amount: number) => {
-      console.log("Setting circulation to:", amount);
       const res = await apiRequest('POST', '/api/admin/set-circulation', { amount });
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
@@ -126,8 +133,7 @@ export default function Admin() {
       }
       return await res.json();
     },
-    onSuccess: (data) => {
-      console.log("Circulation set successfully:", data);
+    onSuccess: () => {
       setIsCirculationDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
@@ -136,7 +142,6 @@ export default function Admin() {
       });
     },
     onError: (error) => {
-      console.error("Circulation setting error:", error);
       if (isUnauthorizedError(error)) {
         toast({
           title: "認証エラー",
@@ -149,8 +154,52 @@ export default function Admin() {
         return;
       }
       toast({
-        title: "設定エラー",
-        description: `システム流通量の設定に失敗しました: ${error.message}`,
+        title: "エラー",
+        description: error.message || "システム流通量の設定に失敗しました。",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Department adjustment mutation (superadmin only)
+  const adjustDepartmentMutation = useMutation({
+    mutationFn: async (data: { department: string; adjustmentAmount: number; reason: string }) => {
+      const res = await apiRequest('POST', `/api/admin/departments/${data.department}/adjust`, {
+        adjustmentAmount: data.adjustmentAmount,
+        reason: data.reason
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `HTTP ${res.status}`);
+      }
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      setIsDepartmentAdjustDialogOpen(false);
+      setAdjustmentData({ department: '', adjustmentAmount: 0, reason: '' });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users/with-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/departments/rankings'] });
+      toast({
+        title: "部門ポイント調整完了",
+        description: `${data.department}部門に${data.adjustmentAmount >= 0 ? '+' : ''}${data.adjustmentAmount}ポイントを調整しました。`,
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "認証エラー",
+          description: "再ログインしています...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "エラー",
+        description: error.message || "部門ポイント調整に失敗しました。",
         variant: "destructive",
       });
     },
@@ -168,9 +217,7 @@ export default function Admin() {
     isActive: true
   });
   
-  // System circulation management state
-  const [isCirculationDialogOpen, setIsCirculationDialogOpen] = useState(false);
-  const [circulationAmount, setCirculationAmount] = useState(1000);
+
 
   // Redirect to home if not authenticated or not admin
   useEffect(() => {
