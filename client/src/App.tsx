@@ -11,28 +11,27 @@ import Login from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, error } = useAuth();
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">読み込み中...</div>;
   }
 
+  // If there's an authentication error or user is not authenticated, redirect to login
+  if (!isAuthenticated) {
+    return (
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route component={Login} />
+      </Switch>
+    );
+  }
+
   return (
     <Switch>
-      {!isAuthenticated ? (
-        <>
-          <Route path="/login" component={Login} />
-          <Route path="/" component={Landing} />
-          <Route path="/admin" component={Landing} />
-          <Route component={Landing} />
-        </>
-      ) : (
-        <>
-          <Route path="/" component={Dashboard} />
-          <Route path="/admin" component={Admin} />
-          <Route component={NotFound} />
-        </>
-      )}
+      <Route path="/" component={Dashboard} />
+      <Route path="/admin" component={Admin} />
+      <Route component={NotFound} />
     </Switch>
   );
 }
