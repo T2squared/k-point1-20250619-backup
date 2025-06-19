@@ -1,0 +1,24 @@
+=== API呼び出し開始 ===
+Error exporting transactions: Error: error:1E08010C:DECODER routines::unsupported
+    at Sign.sign (node:internal/crypto/sig:128:29)
+    at Object.sign (/home/runner/workspace/node_modules/jwa/index.js:166:45)
+    at Object.jwsSign [as sign] (/home/runner/workspace/node_modules/jws/lib/sign-stream.js:32:24)
+    at GoogleToken.requestToken (/home/runner/workspace/node_modules/gtoken/build/src/index.js:225:31)
+    at GoogleToken.getTokenAsyncInner (/home/runner/workspace/node_modules/gtoken/build/src/index.js:163:21)
+    at GoogleToken.getTokenAsync (/home/runner/workspace/node_modules/gtoken/build/src/index.js:142:55)
+    at GoogleToken.getToken (/home/runner/workspace/node_modules/gtoken/build/src/index.js:94:21)
+    at JWT.refreshTokenNoCache (/home/runner/workspace/node_modules/google-auth-library/build/src/auth/jwtclient.js:171:36)
+    at JWT.refreshToken (/home/runner/workspace/node_modules/google-auth-library/build/src/auth/oauth2client.js:152:24)
+    at JWT.getRequestMetadataAsync (/home/runner/workspace/node_modules/google-auth-library/build/src/auth/oauth2client.js:284:28)
+    at JWT.getRequestMetadataAsync (/home/runner/workspace/node_modules/google-auth-library/build/src/auth/jwtclient.js:94:26)
+    at JWT.requestAsync (/home/runner/workspace/node_modules/google-auth-library/build/src/auth/oauth2client.js:357:34)
+    at JWT.request (/home/runner/workspace/node_modules/google-auth-library/build/src/auth/oauth2client.js:351:25)
+    at createAPIRequestAsync (/home/runner/workspace/node_modules/googleapis-common/build/src/apirequest.js:273:31)
+    at Object.createAPIRequest (/home/runner/workspace/node_modules/googleapis-common/build/src/apirequest.js:52:16)
+    at Resource$Spreadsheets$Values.update (/home/runner/workspace/node_modules/googleapis/build/src/apis/sheets/v4.js:602:44)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:264:40)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  library: 'DECODER routines',
+  reason: 'unsupported',
+  code: 'ERR_OSSL_UNSUPPORTED'
+}
