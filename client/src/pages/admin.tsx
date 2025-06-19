@@ -203,6 +203,12 @@ export default function Admin() {
     retry: false,
   });
 
+  const { data: stats } = useQuery({
+    queryKey: ["/api/admin/stats"],
+    enabled: !!user && (user.role === 'admin' || user.role === 'superadmin'),
+    retry: false,
+  });
+
   const { data: departmentRankings } = useQuery({
     queryKey: ["/api/departments/rankings"],
     enabled: !!user && (user.role === 'admin' || user.role === 'superadmin'),
