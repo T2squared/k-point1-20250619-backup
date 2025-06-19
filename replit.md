@@ -101,19 +101,14 @@ K-point is an internal gratitude point system that allows employees to send and 
 - Schema versioning through migrations folder
 
 ## Changelog
-- June 19, 2025 - 完全実装完了
-  - ユーザー認証システム（bcrypt + セッション管理）
-  - ポイント送付機能（日次制限: 3回/日、最大3ポイント/回）
-  - 部門ランキング表示機能
-  - 管理者パネル（ユーザー管理・統計・AI分析）
-  - OpenAI GPT-4o AIコーチング分析機能
-  - Google Sheets V2 データエクスポート機能
-  - CSV出力機能実装
-  - 3段階権限管理（ユーザー/管理者/スーパー管理者）
-  - 完全日本語インターフェース対応
-  - PostgreSQLデータベース統合
-  - リアルタイム取引履歴・残高更新
-  - Git repository initialization completed
+- June 19, 2025 - システムリセット・新構造実装完了
+  - スーパーユーザー専用機能追加（system circulation設定、マイナス残高設定）
+  - 新部門構造実装（集積、製造1、製造2、大臣）
+  - ユーザー1-13作成（部門未設定、後で編集可能）
+  - スーパーユーザーのみ残してデータリセット完了
+  - マイナスポイント設定機能（スーパーユーザー限定）
+  - システム流通量制御機能準備完了
+  - 既存機能維持：認証システム、ポイント送付、AI分析、CSV/Sheets出力
 
 ## User Preferences
 
