@@ -137,21 +137,24 @@ export default function Dashboard() {
                   チーム分配
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
+              <DialogContent className="sm:max-w-[480px]">
                 <DialogHeader>
-                  <DialogTitle>チーム別ポイント分配</DialogTitle>
+                  <DialogTitle className="flex items-center">
+                    <Gift className="h-5 w-5 mr-2 text-primary" />
+                    チーム別ポイント分配
+                  </DialogTitle>
                   <DialogDescription>
-                    指定したチームの全メンバーに均等にポイントを分配します。
+                    選択したチームの全メンバーに均等にポイントを分配します。<br />
+                    固定値ボタンまたはカスタム入力をご利用ください。
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="distributeTeam" className="text-right">
-                      チーム
-                    </Label>
+                <div className="grid gap-6 py-4">
+                  {/* チーム選択 */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">チーム選択</Label>
                     <Select value={distributionData.team} onValueChange={(value) => setDistributionData({...distributionData, team: value})}>
-                      <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="チームを選択" />
+                      <SelectTrigger>
+                        <SelectValue placeholder="チームを選択してください" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="チーム集積">チーム集積</SelectItem>
@@ -161,45 +164,76 @@ export default function Dashboard() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="totalPoints" className="text-right">
-                      総ポイント数
-                    </Label>
-                    <Input
-                      id="totalPoints"
-                      type="number"
-                      value={distributionData.totalPoints}
-                      onChange={(e) => setDistributionData({...distributionData, totalPoints: parseInt(e.target.value) || 0})}
-                      className="col-span-3"
-                      min="1"
-                      placeholder="分配する総ポイント数"
-                    />
+
+                  {/* ポイント選択 */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">ポイント数選択</Label>
+                    
+                    {/* 固定値ボタン */}
+                    <div className="grid grid-cols-4 gap-2">
+                      {[10, 20, 50, 100].map((points) => (
+                        <Button
+                          key={points}
+                          type="button"
+                          variant={distributionData.totalPoints === points ? "default" : "outline"}
+                          onClick={() => setDistributionData({...distributionData, totalPoints: points})}
+                          className="h-12 text-sm"
+                        >
+                          {points}pt
+                        </Button>
+                      ))}
+                    </div>
+                    
+                    {/* カスタム入力 */}
+                    <div className="space-y-2">
+                      <Label className="text-xs text-gray-600">カスタム入力</Label>
+                      <Input
+                        type="number"
+                        value={distributionData.totalPoints || ''}
+                        onChange={(e) => setDistributionData({...distributionData, totalPoints: parseInt(e.target.value) || 0})}
+                        min="1"
+                        placeholder="自由にポイント数を入力"
+                        className="text-center"
+                      />
+                    </div>
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="distributionReason" className="text-right">
-                      理由
-                    </Label>
+
+                  {/* 理由入力 */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">分配理由</Label>
                     <Input
-                      id="distributionReason"
                       value={distributionData.reason}
                       onChange={(e) => setDistributionData({...distributionData, reason: e.target.value})}
-                      className="col-span-3"
-                      placeholder="分配理由（任意）"
+                      placeholder="例：月次成果報酬、プロジェクト完了ボーナス等"
                     />
                   </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="gap-2">
                   <Button 
                     variant="outline" 
-                    onClick={() => setIsTeamDistributionDialogOpen(false)}
+                    onClick={() => {
+                      setIsTeamDistributionDialogOpen(false);
+                      setDistributionData({ team: '', totalPoints: 0, reason: '' });
+                    }}
                   >
                     キャンセル
                   </Button>
                   <Button 
                     onClick={() => distributeToTeamMutation.mutate(distributionData)}
                     disabled={distributeToTeamMutation.isPending || !distributionData.team || !distributionData.totalPoints}
+                    className="bg-primary text-white hover:bg-primary/90"
                   >
-                    {distributeToTeamMutation.isPending ? "分配中..." : "分配実行"}
+                    {distributeToTeamMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        分配中...
+                      </>
+                    ) : (
+                      <>
+                        <Gift className="h-4 w-4 mr-2" />
+                        {distributionData.totalPoints}pt を分配
+                      </>
+                    )}
                   </Button>
                 </DialogFooter>
               </DialogContent>
