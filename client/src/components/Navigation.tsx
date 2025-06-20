@@ -133,10 +133,49 @@ export default function Navigation({ user }: NavigationProps) {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setMobileMenuOpen(false)} />
           <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
             <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+              {/* Mobile Header */}
               <div className="flex items-center flex-shrink-0 px-4 mb-5">
                 <Coins className="h-8 w-8 text-primary mr-2" />
                 <h1 className="text-xl font-bold text-primary">K-point</h1>
               </div>
+
+              {/* User Info in Mobile */}
+              <div className="px-4 mb-5 pb-5 border-b border-gray-200">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage 
+                      src={user.profileImageUrl || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=1976D2&color=fff`} 
+                      alt={`${user.firstName} ${user.lastName}`}
+                    />
+                    <AvatarFallback>
+                      {user.firstName?.[0]}{user.lastName?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{user.lastName} {user.firstName}</p>
+                    <div className="flex items-center space-x-2">
+                      <p className="text-xs text-gray-500">{user.department}</p>
+                      {user.role === 'admin' && (
+                        <Badge variant="secondary" className="text-xs">Admin</Badge>
+                      )}
+                      {user.role === 'superadmin' && (
+                        <Badge variant="destructive" className="text-xs">SuperAdmin</Badge>
+                      )}
+                      {user.role === 'superadmin' && (
+                        <Badge variant="destructive" className="text-xs">SuperAdmin</Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Point Balance in Mobile */}
+                <div className="flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg mt-3">
+                  <Coins className="h-4 w-4 text-secondary" />
+                  <span className="text-sm font-medium">残高: {user.pointBalance}</span>
+                </div>
+              </div>
+
+              {/* Navigation Items */}
               <nav className="px-2 space-y-1">
                 {navigationItems.map((item) => (
                   <Link key={item.href} href={item.href}>
@@ -153,6 +192,30 @@ export default function Navigation({ user }: NavigationProps) {
                   </Link>
                 ))}
               </nav>
+            </div>
+
+            {/* Logout Button at Bottom */}
+            <div className="border-t border-gray-200 p-4">
+              <Button
+                variant="outline"
+                className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                onClick={async () => {
+                  try {
+                    await fetch('/api/logout', {
+                      method: 'POST',
+                      credentials: 'include'
+                    });
+                    queryClient.clear();
+                    window.location.href = '/';
+                  } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '/';
+                  }
+                }}
+              >
+                <LogOut className="h-5 w-5 mr-3" />
+                ログアウト
+              </Button>
             </div>
           </div>
         </div>
