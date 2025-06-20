@@ -1009,7 +1009,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { department } = req.params;
       const { totalPoints, reason } = req.body;
 
-      if (typeof totalPoints !== 'number' || totalPoints <= 0) {
+      if (typeof totalPoints !== 'number' || totalPoints === 0) {
         return res.status(400).json({ message: 'Invalid total points value' });
       }
 

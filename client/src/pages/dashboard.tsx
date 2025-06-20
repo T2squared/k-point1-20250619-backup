@@ -170,16 +170,16 @@ export default function Dashboard() {
                     <Label className="text-sm font-medium">ポイント数選択</Label>
                     
                     {/* 固定値ボタン */}
-                    <div className="grid grid-cols-4 gap-2">
-                      {[10, 20, 50, 100].map((points) => (
+                    <div className="grid grid-cols-5 gap-2">
+                      {[10, 20, 50, 100, -50].map((points) => (
                         <Button
                           key={points}
                           type="button"
                           variant={distributionData.totalPoints === points ? "default" : "outline"}
                           onClick={() => setDistributionData({...distributionData, totalPoints: points})}
-                          className="h-12 text-sm"
+                          className={`h-12 text-sm ${points < 0 ? 'text-red-600 border-red-300 hover:bg-red-50' : ''}`}
                         >
-                          {points}pt
+                          {points > 0 ? '+' : ''}{points}pt
                         </Button>
                       ))}
                     </div>
@@ -191,8 +191,7 @@ export default function Dashboard() {
                         type="number"
                         value={distributionData.totalPoints || ''}
                         onChange={(e) => setDistributionData({...distributionData, totalPoints: parseInt(e.target.value) || 0})}
-                        min="1"
-                        placeholder="自由にポイント数を入力"
+                        placeholder="自由にポイント数を入力（マイナス値も可）"
                         className="text-center"
                       />
                     </div>
@@ -220,8 +219,8 @@ export default function Dashboard() {
                   </Button>
                   <Button 
                     onClick={() => distributeToTeamMutation.mutate(distributionData)}
-                    disabled={distributeToTeamMutation.isPending || !distributionData.team || !distributionData.totalPoints}
-                    className="bg-primary text-white hover:bg-primary/90"
+                    disabled={distributeToTeamMutation.isPending || !distributionData.team || distributionData.totalPoints === 0}
+                    className={`text-white hover:opacity-90 ${distributionData.totalPoints < 0 ? 'bg-red-600 hover:bg-red-700' : 'bg-primary hover:bg-primary/90'}`}
                   >
                     {distributeToTeamMutation.isPending ? (
                       <>
@@ -231,7 +230,7 @@ export default function Dashboard() {
                     ) : (
                       <>
                         <Gift className="h-4 w-4 mr-2" />
-                        {distributionData.totalPoints}pt を分配
+                        {distributionData.totalPoints > 0 ? '+' : ''}{distributionData.totalPoints}pt を分配
                       </>
                     )}
                   </Button>
