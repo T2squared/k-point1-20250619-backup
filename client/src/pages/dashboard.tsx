@@ -144,7 +144,7 @@ export default function Dashboard() {
                     チーム別ポイント分配
                   </DialogTitle>
                   <DialogDescription>
-                    選択したチームの全メンバーに均等にポイントを分配します。<br />
+                    選択したチームのポイント調整を行います。<br />
                     固定値ボタンまたはカスタム入力をご利用ください。
                   </DialogDescription>
                 </DialogHeader>
