@@ -394,10 +394,18 @@ export class DatabaseStorage implements IStorage {
       .from(transactions)
       .where(gte(transactions.createdAt, today));
     
+    // アクティブ部署からSuperAdminと空文字列を除外
     const [deptCount] = await db
       .select({ count: sql<number>`count(distinct ${users.department})` })
       .from(users)
-      .where(eq(users.isActive, true));
+      .where(and(
+        eq(users.isActive, true),
+        ne(users.department, ''),
+        ne(users.department, 'SuperAdmin'),
+        ne(users.department, '未設定')
+      ));
+    
+    console.log('Active departments debug - count:', deptCount?.count);
     
     const totalCirculation = await this.getTotalCirculation();
     
