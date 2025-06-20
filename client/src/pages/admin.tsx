@@ -649,41 +649,83 @@ export default function Admin() {
             
             <Card>
               <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-warning/10">
-                      <TrendingUp className="h-6 w-6 text-warning" />
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex items-center">
+                      <div className="p-3 rounded-full bg-warning/10">
+                        <TrendingUp className="h-6 w-6 text-warning" />
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">総流通量</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats?.totalCirculation || 0}</p>
+                      </div>
                     </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">総流通量</p>
-                      <p className="text-2xl font-bold text-gray-900">{stats?.totalCirculation || 0}</p>
+                    {user?.role === 'superadmin' && (
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setCirculationAmount(stats?.totalCirculation || 0);
+                            setIsCirculationDialogOpen(true);
+                          }}
+                          className="text-xs px-3 py-1 h-7"
+                        >
+                          <Settings className="h-3 w-3 mr-1" />
+                          流通量設定
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setIsDepartmentAdjustDialogOpen(true)}
+                          className="text-xs px-3 py-1 h-7"
+                        >
+                          <Settings className="h-3 w-3 mr-1" />
+                          チーム調整
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Circulation Analysis */}
+                  <div className="border-t pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                      <div className="text-center">
+                        <p className="text-gray-600">ユーザー保有総計</p>
+                        <p className={`font-bold ${
+                          (allUsers?.reduce((sum: number, user: any) => sum + user.pointBalance, 0) || 0) < 0 
+                            ? 'text-red-500' 
+                            : 'text-gray-900'
+                        }`}>
+                          {allUsers?.reduce((sum: number, user: any) => sum + user.pointBalance, 0) || 0} ポイント
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-gray-600">差分</p>
+                        <p className={`font-bold ${
+                          ((stats?.totalCirculation || 0) - (allUsers?.reduce((sum: number, user: any) => sum + user.pointBalance, 0) || 0)) === 0
+                            ? 'text-green-600'
+                            : 'text-orange-600'
+                        }`}>
+                          {((stats?.totalCirculation || 0) - (allUsers?.reduce((sum: number, user: any) => sum + user.pointBalance, 0) || 0)) >= 0 ? '+' : ''}
+                          {(stats?.totalCirculation || 0) - (allUsers?.reduce((sum: number, user: any) => sum + user.pointBalance, 0) || 0)} ポイント
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-gray-600">バランス状況</p>
+                        <p className={`font-bold text-xs ${
+                          ((stats?.totalCirculation || 0) - (allUsers?.reduce((sum: number, user: any) => sum + user.pointBalance, 0) || 0)) === 0
+                            ? 'text-green-600'
+                            : 'text-orange-600'
+                        }`}>
+                          {((stats?.totalCirculation || 0) - (allUsers?.reduce((sum: number, user: any) => sum + user.pointBalance, 0) || 0)) === 0
+                            ? '✓ バランス良好'
+                            : '△ 差分あり'
+                          }
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  {user?.role === 'superadmin' && (
-                    <div className="flex flex-col gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setCirculationAmount(stats?.totalCirculation || 0);
-                          setIsCirculationDialogOpen(true);
-                        }}
-                        className="text-xs px-3 py-1 h-7"
-                      >
-                        <Settings className="h-3 w-3 mr-1" />
-                        流通量設定
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setIsDepartmentAdjustDialogOpen(true)}
-                        className="text-xs px-3 py-1 h-7"
-                      >
-                        <Settings className="h-3 w-3 mr-1" />
-                        チーム調整
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
