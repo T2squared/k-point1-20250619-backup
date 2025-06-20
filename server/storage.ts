@@ -589,6 +589,60 @@ export class DatabaseStorage implements IStorage {
     
     return await query;
   }
+
+  async distributePointsToTeam(department: string, totalPoints: number, reason: string, distributedBy: string): Promise<void> {
+    console.log(`Starting team distribution: ${totalPoints} points to ${department} by ${distributedBy}`);
+
+    // Get all active users in the department (excluding superadmin)
+    const departmentUsers = await db
+      .select()
+      .from(users)
+      .where(and(
+        eq(users.department, department),
+        eq(users.isActive, true),
+        ne(users.role, 'superadmin')
+      ));
+
+    if (departmentUsers.length === 0) {
+      throw new Error(`No active users found in department: ${department}`);
+    }
+
+    // Calculate points per user (distribute evenly)
+    const pointsPerUser = Math.floor(totalPoints / departmentUsers.length);
+    const remainder = totalPoints % departmentUsers.length;
+
+    console.log(`Distributing ${pointsPerUser} points to each of ${departmentUsers.length} users, remainder: ${remainder}`);
+
+    // Update each user's balance and create transactions
+    for (let i = 0; i < departmentUsers.length; i++) {
+      const user = departmentUsers[i];
+      const extraPoint = i < remainder ? 1 : 0; // Distribute remainder to first few users
+      const distributionAmount = pointsPerUser + extraPoint;
+      const newBalance = user.pointBalance + distributionAmount;
+
+      // Update user balance
+      await db
+        .update(users)
+        .set({ 
+          pointBalance: newBalance,
+          updatedAt: new Date() 
+        })
+        .where(eq(users.id, user.id));
+
+      // Create transaction record
+      await db.insert(transactions).values({
+        senderId: distributedBy,
+        receiverId: user.id,
+        points: distributionAmount,
+        message: reason,
+        createdAt: new Date()
+      });
+
+      console.log(`Distributed ${distributionAmount} points to user ${user.id}, new balance: ${newBalance}`);
+    }
+
+    console.log(`Team distribution completed: ${totalPoints} points distributed to ${department}`);
+  }
 }
 
 export const storage = new DatabaseStorage();

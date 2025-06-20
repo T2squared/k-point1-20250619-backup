@@ -999,6 +999,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Team distribution route (admin/superadmin only)
+  app.post('/api/admin/departments/:department/distribute', isAuthenticated, async (req: any, res) => {
+    if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    try {
+      const { department } = req.params;
+      const { totalPoints, reason } = req.body;
+
+      if (typeof totalPoints !== 'number' || totalPoints <= 0) {
+        return res.status(400).json({ message: 'Invalid total points value' });
+      }
+
+      await storage.distributePointsToTeam(department, totalPoints, reason || 'チーム分配', req.user.id);
+      res.json({ message: 'Points distributed to team successfully', team: department, totalPoints });
+    } catch (error) {
+      console.error('Error distributing points to team:', error);
+      res.status(500).json({ message: 'Failed to distribute points to team' });
+    }
+  });
+
+  // Admin user balance adjustment route
+  app.put('/api/admin/users/:userId/balance', isAuthenticated, async (req: any, res) => {
+    if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    try {
+      const { userId } = req.params;
+      const { balance } = req.body;
+
+      if (typeof balance !== 'number') {
+        return res.status(400).json({ message: 'Invalid balance value' });
+      }
+
+      await storage.updateUserBalance(userId, balance);
+      res.json({ message: 'Balance updated successfully' });
+    } catch (error) {
+      console.error('Error updating user balance:', error);
+      res.status(500).json({ message: 'Failed to update user balance' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

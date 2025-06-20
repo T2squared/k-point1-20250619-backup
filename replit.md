@@ -123,3 +123,23 @@ K-point is an internal gratitude point system that allows employees to send and 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+## Quality Assurance Rules
+
+### Code Implementation Policy (Added December 20, 2024)
+1. **Mandatory Sanity Checks**: Before providing any code implementation:
+   - Always verify the current state of files using view commands
+   - Check for existing implementations to avoid duplicates
+   - Confirm the exact file structure and content
+   - Test for missing imports, functions, or state variables
+
+2. **Implementation Verification**: After making changes:
+   - Verify all required imports are present
+   - Confirm all state variables are properly defined
+   - Check that all referenced functions exist
+   - Ensure proper error handling is in place
+
+3. **User Communication**: When reporting completion:
+   - Only report features as "completed" after sanity checks pass
+   - Provide specific details about what was verified
+   - If issues are found during checks, fix them before reporting success

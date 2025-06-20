@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
@@ -7,15 +7,28 @@ import RecentActivity from "@/components/RecentActivity";
 import TransactionHistory from "@/components/TransactionHistory";
 import DepartmentRankings from "@/components/DepartmentRankings";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Coins, Send, Gift, TrendingUp, Settings } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  
+  // Team distribution state
+  const [isTeamDistributionDialogOpen, setIsTeamDistributionDialogOpen] = useState(false);
+  const [distributionData, setDistributionData] = useState({
+    team: '',
+    totalPoints: 0,
+    reason: ''
+  });
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -50,6 +63,51 @@ export default function Dashboard() {
     retry: false,
   });
 
+  // Team distribution mutation (admin/superadmin only)
+  const distributeToTeamMutation = useMutation({
+    mutationFn: async (data: { team: string; totalPoints: number; reason: string }) => {
+      const res = await apiRequest('POST', `/api/admin/departments/${data.team}/distribute`, {
+        totalPoints: data.totalPoints,
+        reason: data.reason
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `HTTP ${res.status}`);
+      }
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      setIsTeamDistributionDialogOpen(false);
+      setDistributionData({ team: '', totalPoints: 0, reason: '' });
+      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/departments/rankings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/transactions/recent'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users/with-stats'] });
+      toast({
+        title: "チーム分配完了",
+        description: `${data.team}チームに${data.totalPoints}ポイントを分配しました。`,
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "認証エラー",
+          description: "ログアウトしました。再度ログインしてください。",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "エラー",
+        description: error.message || "チーム分配に失敗しました。",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -66,9 +124,87 @@ export default function Dashboard() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Dashboard Header */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">ダッシュボード</h2>
-          <p className="text-gray-600">チームメンバーに感謝の気持ちをK-pointで表現しましょう</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">ダッシュボード</h2>
+            <p className="text-gray-600">チームメンバーに感謝の気持ちをK-pointで表現しましょう</p>
+          </div>
+          {(user.role === 'admin' || user.role === 'superadmin') && (
+            <Dialog open={isTeamDistributionDialogOpen} onOpenChange={setIsTeamDistributionDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="bg-primary text-white hover:bg-primary/90">
+                  <Gift className="h-4 w-4 mr-2" />
+                  チーム分配
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>チーム別ポイント分配</DialogTitle>
+                  <DialogDescription>
+                    指定したチームの全メンバーに均等にポイントを分配します。
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="distributeTeam" className="text-right">
+                      チーム
+                    </Label>
+                    <Select value={distributionData.team} onValueChange={(value) => setDistributionData({...distributionData, team: value})}>
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="チームを選択" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="チーム集積">チーム集積</SelectItem>
+                        <SelectItem value="チーム製造1">チーム製造1</SelectItem>
+                        <SelectItem value="チーム製造2">チーム製造2</SelectItem>
+                        <SelectItem value="チーム大臣">チーム大臣</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="totalPoints" className="text-right">
+                      総ポイント数
+                    </Label>
+                    <Input
+                      id="totalPoints"
+                      type="number"
+                      value={distributionData.totalPoints}
+                      onChange={(e) => setDistributionData({...distributionData, totalPoints: parseInt(e.target.value) || 0})}
+                      className="col-span-3"
+                      min="1"
+                      placeholder="分配する総ポイント数"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="distributionReason" className="text-right">
+                      理由
+                    </Label>
+                    <Input
+                      id="distributionReason"
+                      value={distributionData.reason}
+                      onChange={(e) => setDistributionData({...distributionData, reason: e.target.value})}
+                      className="col-span-3"
+                      placeholder="分配理由（任意）"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsTeamDistributionDialogOpen(false)}
+                  >
+                    キャンセル
+                  </Button>
+                  <Button 
+                    onClick={() => distributeToTeamMutation.mutate(distributionData)}
+                    disabled={distributeToTeamMutation.isPending || !distributionData.team || !distributionData.totalPoints}
+                  >
+                    {distributeToTeamMutation.isPending ? "分配中..." : "分配実行"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
 
         {/* Stats Cards */}
