@@ -1201,6 +1201,7 @@ export default function Admin() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>ユーザー</TableHead>
+                    <TableHead>ログインID</TableHead>
                     <TableHead>チーム</TableHead>
                     <TableHead>残高</TableHead>
                     <TableHead>今月受信</TableHead>
@@ -1243,6 +1244,14 @@ export default function Admin() {
                               </div>
                             )}
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                          {rowUser.id}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          パスワード: 0000
                         </div>
                       </TableCell>
                       <TableCell>
