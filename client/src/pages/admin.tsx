@@ -87,6 +87,7 @@ export default function Admin() {
     adjustmentAmount: 0,
     reason: ''
   });
+  const [teamFilter, setTeamFilter] = useState<string>('all');
   
   // Name update mutation (superadmin only)
   const updateUserNameMutation = useMutation({
@@ -725,7 +726,11 @@ export default function Admin() {
                         value === 'memberCount' ? 'メンバー数' : '平均ポイント'
                       }
                     />
-                    <Bar dataKey="totalPoints" fill="#1f77b4" name="totalPoints" />
+                    <Bar dataKey="totalPoints" name="totalPoints">
+                      {departmentChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.totalPoints < 0 ? "#ef4444" : "#1f77b4"} />
+                      ))}
+                    </Bar>
                     <Bar dataKey="memberCount" fill="#ff7f0e" name="memberCount" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -967,7 +972,22 @@ export default function Admin() {
                   <Users className="h-5 w-5 text-primary" />
                   <span>ユーザー管理</span>
                 </CardTitle>
-                <Dialog open={isCreateUserDialogOpen} onOpenChange={setIsCreateUserDialogOpen}>
+                <div className="flex items-center space-x-4">
+                  <Select value={teamFilter} onValueChange={setTeamFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="チームでフィルタ" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">全チーム</SelectItem>
+                      <SelectItem value="未設定">未設定</SelectItem>
+                      <SelectItem value="チーム集積">チーム集積</SelectItem>
+                      <SelectItem value="チーム製造1">チーム製造1</SelectItem>
+                      <SelectItem value="チーム製造2">チーム製造2</SelectItem>
+                      <SelectItem value="チーム大臣">チーム大臣</SelectItem>
+                      <SelectItem value="SuperAdmin">SuperAdmin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Dialog open={isCreateUserDialogOpen} onOpenChange={setIsCreateUserDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
@@ -1134,7 +1154,7 @@ export default function Admin() {
                     <DialogHeader>
                       <DialogTitle>チーム別ポイント調整</DialogTitle>
                       <DialogDescription>
-                        チーム全体のポイントを調整し、該当チームのユーザーに自動で再分配します。
+                        チーム全体のポイント数を調整します。
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -1180,7 +1200,7 @@ export default function Admin() {
                         />
                       </div>
                       <div className="text-sm text-gray-500 px-4">
-                        ※ポイントは該当部門の全ユーザーに均等分配されます
+                        ※チーム全体のポイント数のみを調整します
                       </div>
                     </div>
                     <DialogFooter>
@@ -1194,6 +1214,7 @@ export default function Admin() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -1210,7 +1231,9 @@ export default function Admin() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {allUsers.map((rowUser: any) => (
+                  {allUsers
+                    .filter((rowUser: any) => teamFilter === 'all' || rowUser.department === teamFilter)
+                    .map((rowUser: any) => (
                     <TableRow key={rowUser.id}>
                       <TableCell>
                         <div className="flex items-center space-x-3">

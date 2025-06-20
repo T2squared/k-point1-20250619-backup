@@ -520,61 +520,18 @@ export class DatabaseStorage implements IStorage {
 
   // Department adjustment operations (superadmin only)
   async adjustDepartmentPoints(department: string, adjustmentAmount: number, reason: string, adjustedBy: string): Promise<void> {
-    try {
-      console.log(`Adjusting department ${department} by ${adjustmentAmount} points. Reason: ${reason}`);
-      
-      // Record the adjustment
-      await db.insert(departmentAdjustments).values({
-        department,
-        adjustmentAmount,
-        reason,
-        adjustedBy,
-        createdAt: new Date()
-      });
+    console.log(`Starting department adjustment: ${adjustmentAmount} points for ${department} by ${adjustedBy}`);
 
-      // Get all active users in the department (excluding superadmin)
-      const departmentUsers = await db
-        .select()
-        .from(users)
-        .where(and(
-          eq(users.department, department),
-          eq(users.isActive, true),
-          ne(users.role, 'superadmin')
-        ));
+    // Record the adjustment only - no actual distribution to users
+    await db.insert(departmentAdjustments).values({
+      department,
+      adjustmentAmount,
+      reason,
+      adjustedBy,
+      createdAt: new Date()
+    });
 
-      if (departmentUsers.length === 0) {
-        throw new Error(`No active users found in department: ${department}`);
-      }
-
-      // Calculate points per user (distribute evenly)
-      const pointsPerUser = Math.floor(adjustmentAmount / departmentUsers.length);
-      const remainder = adjustmentAmount % departmentUsers.length;
-
-      console.log(`Distributing ${pointsPerUser} points to each of ${departmentUsers.length} users, remainder: ${remainder}`);
-
-      // Update each user's balance
-      for (let i = 0; i < departmentUsers.length; i++) {
-        const user = departmentUsers[i];
-        const extraPoint = i < remainder ? 1 : 0; // Distribute remainder to first few users
-        const adjustment = pointsPerUser + extraPoint;
-        const newBalance = user.pointBalance + adjustment;
-
-        await db
-          .update(users)
-          .set({ 
-            pointBalance: newBalance,
-            updatedAt: new Date() 
-          })
-          .where(eq(users.id, user.id));
-
-        console.log(`User ${user.firstName} ${user.lastName} (${user.id}): ${user.pointBalance} -> ${newBalance} (${adjustment >= 0 ? '+' : ''}${adjustment})`);
-      }
-
-      console.log(`Department adjustment completed: ${department} ${adjustmentAmount >= 0 ? '+' : ''}${adjustmentAmount} points`);
-    } catch (error) {
-      console.error("Error in adjustDepartmentPoints:", error);
-      throw error;
-    }
+    console.log(`Department adjustment recorded: ${adjustmentAmount} points adjustment for ${department}`);
   }
 
   async getDepartmentAdjustments(department?: string): Promise<DepartmentAdjustment[]> {
