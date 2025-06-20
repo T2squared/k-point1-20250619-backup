@@ -1033,18 +1033,18 @@ export default function Admin() {
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="department" className="text-right">
-                          部署
+                          チーム
                         </Label>
                         <Select value={newUser.department} onValueChange={(value) => setNewUser({ ...newUser, department: value })}>
                           <SelectTrigger className="col-span-3">
-                            <SelectValue placeholder="部署を選択" />
+                            <SelectValue placeholder="チームを選択" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="未設定">未設定</SelectItem>
-                            <SelectItem value="集積">集積</SelectItem>
-                            <SelectItem value="製造1">製造1</SelectItem>
-                            <SelectItem value="製造2">製造2</SelectItem>
-                            <SelectItem value="大臣">大臣</SelectItem>
+                            <SelectItem value="チーム集積">チーム集積</SelectItem>
+                            <SelectItem value="チーム製造1">チーム製造1</SelectItem>
+                            <SelectItem value="チーム製造2">チーム製造2</SelectItem>
+                            <SelectItem value="チーム大臣">チーム大臣</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -1201,7 +1201,7 @@ export default function Admin() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>ユーザー</TableHead>
-                    <TableHead>部署</TableHead>
+                    <TableHead>チーム</TableHead>
                     <TableHead>残高</TableHead>
                     <TableHead>今月受信</TableHead>
                     <TableHead>権限</TableHead>
@@ -1256,10 +1256,10 @@ export default function Admin() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="未設定">未設定</SelectItem>
-                              <SelectItem value="集積">集積</SelectItem>
-                              <SelectItem value="製造1">製造1</SelectItem>
-                              <SelectItem value="製造2">製造2</SelectItem>
-                              <SelectItem value="大臣">大臣</SelectItem>
+                              <SelectItem value="チーム集積">チーム集積</SelectItem>
+                              <SelectItem value="チーム製造1">チーム製造1</SelectItem>
+                              <SelectItem value="チーム製造2">チーム製造2</SelectItem>
+                              <SelectItem value="チーム大臣">チーム大臣</SelectItem>
                             </SelectContent>
                           </Select>
                         ) : (
