@@ -101,6 +101,14 @@ K-point is an internal gratitude point system that allows employees to send and 
 - Schema versioning through migrations folder
 
 ## Changelog
+- June 20, 2025 - システム拡張・UI改善完了
+  - ユーザー管理画面にチームフィルタ機能追加
+  - 管理画面のチーム別分析グラフでマイナス値を赤色表示
+  - 総流通量セクションにユーザー保有総計と差分分析機能追加
+  - ユーザー管理画面に残高合計・平均残高表示機能追加
+  - チーム調整機能を記録のみに変更（実際の分配は停止）
+  - ユーザー4人追加（14-17）で合計17名体制に拡張
+  - チーム再配置完了：集積4名、製造1・製造2各4名、大臣5名、SuperAdmin2名
 - June 19, 2025 - システムリセット・新構造実装完了
   - スーパーユーザー専用機能追加（system circulation設定、マイナス残高設定）
   - 新部門構造実装（集積、製造1、製造2、大臣）
