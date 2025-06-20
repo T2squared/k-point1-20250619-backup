@@ -181,8 +181,8 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ['/api/users/with-stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/departments/rankings'] });
       toast({
-        title: "部門ポイント調整完了",
-        description: `${data.department}部門に${data.adjustmentAmount >= 0 ? '+' : ''}${data.adjustmentAmount}ポイントを調整しました。`,
+        title: "チームポイント調整完了",
+        description: `${data.department}チームに${data.adjustmentAmount >= 0 ? '+' : ''}${data.adjustmentAmount}ポイントを調整しました。`,
       });
     },
     onError: (error) => {
@@ -199,7 +199,7 @@ export default function Admin() {
       }
       toast({
         title: "エラー",
-        description: error.message || "部門ポイント調整に失敗しました。",
+        description: error.message || "チームポイント調整に失敗しました。",
         variant: "destructive",
       });
     },
@@ -679,7 +679,7 @@ export default function Admin() {
                         className="text-xs px-3 py-1 h-7"
                       >
                         <Settings className="h-3 w-3 mr-1" />
-                        部門調整
+                        チーム調整
                       </Button>
                     </div>
                   )}
@@ -696,7 +696,7 @@ export default function Admin() {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
-                <span>部門別分析</span>
+                <span>チーム別分析</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -733,7 +733,7 @@ export default function Admin() {
               <EditableAIInsights 
                 type="department"
                 data={departmentChartData}
-                title="部門別分析"
+                title="チーム別分析"
                 userRole={user?.role}
               />
             </CardContent>
@@ -744,7 +744,7 @@ export default function Admin() {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <PieChart className="h-5 w-5 text-primary" />
-                <span>部門別ポイント分布</span>
+                <span>チーム別ポイント分布</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -771,7 +771,7 @@ export default function Admin() {
               <EditableAIInsights 
                 type="distribution"
                 data={departmentChartData}
-                title="部門別ポイント分布"
+                title="チーム別ポイント分布"
                 userRole={user?.role}
               />
             </CardContent>
@@ -1132,25 +1132,25 @@ export default function Admin() {
                 <Dialog open={isDepartmentAdjustDialogOpen} onOpenChange={setIsDepartmentAdjustDialogOpen}>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                      <DialogTitle>部門別ポイント調整</DialogTitle>
+                      <DialogTitle>チーム別ポイント調整</DialogTitle>
                       <DialogDescription>
-                        部門全体のポイントを調整し、該当部門のユーザーに自動で再分配します。
+                        チーム全体のポイントを調整し、該当チームのユーザーに自動で再分配します。
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="adjustDepartment" className="text-right">
-                          部門
+                          チーム
                         </Label>
                         <Select value={adjustmentData.department} onValueChange={(value) => setAdjustmentData({...adjustmentData, department: value})}>
                           <SelectTrigger className="col-span-3">
-                            <SelectValue placeholder="部門を選択" />
+                            <SelectValue placeholder="チームを選択" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="集積">集積</SelectItem>
-                            <SelectItem value="製造1">製造1</SelectItem>
-                            <SelectItem value="製造2">製造2</SelectItem>
-                            <SelectItem value="大臣">大臣</SelectItem>
+                            <SelectItem value="チーム集積">チーム集積</SelectItem>
+                            <SelectItem value="チーム製造1">チーム製造1</SelectItem>
+                            <SelectItem value="チーム製造2">チーム製造2</SelectItem>
+                            <SelectItem value="チーム大臣">チーム大臣</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

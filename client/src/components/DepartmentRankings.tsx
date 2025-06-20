@@ -26,7 +26,7 @@ export default function DepartmentRankings({ rankings }: DepartmentRankingsProps
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <TrendingUp className="h-5 w-5 text-primary" />
-          <span>部署別ランキング</span>
+          <span>チーム別ランキング</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
