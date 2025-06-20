@@ -304,6 +304,11 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* Department Rankings at the top */}
+        <div className="mb-8">
+          <DepartmentRankings rankings={(departmentRankings || []).filter((dept: any) => dept.name !== 'SuperAdmin' && dept.name !== '')} />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Send Points Section */}
           <div className="lg:col-span-2">
@@ -313,7 +318,6 @@ export default function Dashboard() {
           {/* Recent Activity Sidebar */}
           <div className="space-y-6">
             <RecentActivity />
-            <DepartmentRankings rankings={(departmentRankings || []).filter((dept: any) => dept.name !== 'SuperAdmin' && dept.name !== '')} />
           </div>
         </div>
 
