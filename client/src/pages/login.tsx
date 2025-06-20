@@ -123,16 +123,7 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-medium text-gray-800 mb-2">デモユーザー:</h3>
-              <div className="text-sm text-gray-600 space-y-1">
-                <div><strong>SuperAdmin:</strong> admin2 / pass123</div>
-                <div><strong>SuperAdmin:</strong> kazuka / pass123</div>
-                <div><strong>Admin:</strong> admin1 / pass123</div>
-                <div><strong>ユーザー:</strong> demo1 / pass123</div>
-                <div><strong>ユーザー:</strong> demo2 / pass123</div>
-              </div>
-            </div>
+
           </CardContent>
         </Card>
       </div>
