@@ -1340,19 +1340,38 @@ export default function Admin() {
                             </Button>
                           </div>
                         ) : (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEditingUser({
-                              id: rowUser.id,
-                              firstName: rowUser.firstName,
-                              lastName: rowUser.lastName,
-                              department: rowUser.department,
-                              role: rowUser.role
-                            })}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                          <div className="flex space-x-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditingUser({
+                                id: rowUser.id,
+                                firstName: rowUser.firstName,
+                                lastName: rowUser.lastName,
+                                department: rowUser.department,
+                                role: rowUser.role
+                              })}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            {(user?.role === 'admin' || user?.role === 'superadmin') && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setBalanceEditingUser({
+                                    id: rowUser.id,
+                                    name: `${rowUser.lastName} ${rowUser.firstName}`,
+                                    currentBalance: rowUser.pointBalance,
+                                    newBalance: rowUser.pointBalance
+                                  });
+                                  setIsBalanceDialogOpen(true);
+                                }}
+                              >
+                                残高
+                              </Button>
+                            )}
+                          </div>
                         )}
                       </TableCell>
                     </TableRow>

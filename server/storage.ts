@@ -77,6 +77,9 @@ export interface IStorage {
   adjustDepartmentPoints(department: string, adjustmentAmount: number, reason: string, adjustedBy: string): Promise<void>;
   getDepartmentAdjustments(department?: string): Promise<DepartmentAdjustment[]>;
   
+  // Team distribution operations (admin/superadmin only)
+  distributePointsToTeam(department: string, totalPoints: number, reason: string, distributedBy: string): Promise<void>;
+  
   // Coach analysis operations
   saveCoachAnalysis(analysis: InsertCoachAnalysis): Promise<CoachAnalysis>;
   getCoachAnalysis(date: string, analysisType: string): Promise<CoachAnalysis | undefined>;
